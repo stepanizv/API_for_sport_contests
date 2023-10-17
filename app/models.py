@@ -1,8 +1,6 @@
 import re
 from app import USERS, CONTESTS
-import numpy as np
-from matplotlib import pyplot as plt
-
+from enum import Enum
 
 class User:
     def __init__(self, id, first_name, last_name, email, sport, contests):
@@ -14,6 +12,7 @@ class User:
         self.contests = contests
 
     def repr(self):
+        # the representation of a User-object
         return f"{self.id}) {self.first_name} {self.last_name}"
 
     def convert_to_dict(self):
@@ -27,22 +26,25 @@ class User:
         }
 
     @staticmethod
+    # checks the id for validity
     def is_valid_id(id):
         return id >= 0 and id < len(USERS)
 
     @staticmethod
+    # checks the email for validity
     def is_valid_email(email):
         if (
-            re.match(
-                r"[^@]+@[^@]+\.[^@]+",
-                email,
-            )
-            != None
+                re.match(
+                    r"[^@]+@[^@]+\.[^@]+",
+                    email,
+                )
+                != None
         ):
             return True
         return False
 
     @staticmethod
+    # checks if the email is already occupied by another user
     def is_email_occupied(email):
         return any(user.email == email for user in USERS)
 
@@ -57,6 +59,7 @@ class Contest:
         self.winner = winner
 
     def repr(self):
+        # the representation of a Contest-object
         return f"{self.id}) {self.name}"
 
     def convert_to_dict(self):
@@ -71,33 +74,19 @@ class Contest:
         }
 
     def is_finished(self):
-        return self.status == "FINISHED"
+        # checks if the contests is already finished
+        return self.status == Status.FINISHED
 
     def is_valid_winner(self, winner):
+        # checks if the user, being assigned as the winner, in the list of participants
         return winner in self.participants
 
     @staticmethod
+    # checks the contest id for validity
     def is_valid_id(id):
         return id >= 0 and id < len(CONTESTS)
 
-
-def remove_finished_contest(USERS, contest_id):
-    for user in USERS:
-        if contest_id in user.contests:
-            user.contests.pop(user.contests.index(contest_id))
-
-
-def create_graph(USERS):
-    x = np.arange([f"{user.id}, {user.first_name} {user.last_name}" for user in USERS])
-    y = np.array([len(user.contests) for user in USERS])
-    plt.figure()
-    plt.xticks(ticks=np.array([user.id for user in USERS]), rotation=40)
-    plt.yticks(ticks=np.arange(min(y), max(y)))
-    plt.ylim(max(y) + 1)
-    plt.xlim((max(x) + 1))
-    plt.title("The leaderboard of all users by numbers of contests")
-    plt.xlabel("users' ids")
-    plt.ylabel("numbers of contests")
-    plt.grid()
-    plt.bar(x, y, width=0.1)
-    plt.savefig("app/leaderboard.png")
+class Status(Enum):
+    # status of contests
+    STARTED = "Started"
+    FINISHED = "Finished"

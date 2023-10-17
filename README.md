@@ -5,18 +5,18 @@ Allows users to create models of sport competitions and their participants as we
 
 ## Technical requirements
 
-+ Создает пользователя (проверяет почту на правильность), который может участвовать в соревнованиях по одному виду спорта
-+ Выдает данные по конкретному пользователю
-+ Создает соревнование (виды соревнований: настольный теннис, бокс, ...). Присваивает статус "STARTED"
-+ Выдает данные по конкретному соревнованию
-+ Завершает соревнование. Назначает победителя, присваивает статус "FINISHED"
-+ Выдает историю соревнований по конкретному пользователю
-+ Генерирует список пользователей, отсортированный по количеству соревнований
-+ Генерирует график пользователей по количеству соревнований
++ Create a user (check the email for validity), which can participate at contests in only one sport
++ Output the data of a requested user
++ Create a contest (sports: table tennis, boxing, ...). Initialize the "STARTED" status
++ Output the data of a requested contest
++ Finish a contest. Assign the winner, initialize the "FINISHED" status
++ Output the history of a user's contests
++ Generate the users list sorted by the amount of each user's contests
++ Generate the graph of users sorted by the amount of each user's contests
 
 ## Queries and responses
 
-- Создание пользователя `POST /users/create`
+- Creating a user `POST /users/create`
 
 Request example:
 ```json
@@ -42,7 +42,7 @@ Response example:
 }
 ```
 
-- Получение данных по определенному пользователю `GET /users/<user_id>`
+- Output the data of a requested user `GET /users/<user_id>`
 
 Response example:
 ```json
@@ -58,7 +58,7 @@ Response example:
 }
 ```
 
-- Создание соревнования `POST /contests/create`
+- Create a contest `POST /contests/create`
 
 Request example:
 ```json
@@ -87,7 +87,7 @@ Response example:
 }
 ```
 
-- Получение данных по определенному соревнованию `GET /contests/<contest_id>`
+- Output the data of a requested contest `GET /contests/<contest_id>`
 
 Response example:
 ```json
@@ -104,7 +104,7 @@ Response example:
 }
 ```
 
-- Завершает соревнование `POST /contests/<contest_id>/finish`
+- Finish a contest `POST /contests/<contest_id>/finish`
 
 Request example:
 ```json
@@ -127,7 +127,7 @@ Response example:
 }
 ```
 
-- Получение соревнований конкретного пользователя `GET /users/<user_id>/contests`
+- Output the history of a user's contests `GET /users/<user_id>/contests`
 
 Response example:
 ```json
@@ -151,7 +151,7 @@ Response example:
 }
 ```
 
-- Генерирует список пользователей, отсортированному по количеству соревнований `GET /users/leaderboard`
+- Generate the users list sorted by the amount of each user's contests `GET /users/leaderboard`
 
 Значение `asc` обозначет `ascending` (по возрастанию), параметр `desc` обозначет `descending` (по убыванию)
 
@@ -184,7 +184,7 @@ Response example:
 }
 ```
 
-- Получение графика пользователей по количеству соревнований `GET /users/leaderboard`
+- Generate the graph of users list sorted by the amount of each user's contests `GET /users/leaderboard`
 
 Request example:
 ```json
