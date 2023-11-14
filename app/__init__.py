@@ -8,3 +8,4 @@ CONTESTS = []   # a list of Contest-type objects
 from app import views_all
 from app import models
 from app import views
+from app import tests
