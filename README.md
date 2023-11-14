@@ -153,7 +153,7 @@ Response example:
 
 - Generate the users list sorted by the amount of each user's contests `GET /users/leaderboard`
 
-Значение `asc` обозначет `ascending` (по возрастанию), параметр `desc` обозначет `descending` (по убыванию)
+Values `asc`and `desc` stand for `ascending` and `descending` respectively
 
 Request example:
 ```json
