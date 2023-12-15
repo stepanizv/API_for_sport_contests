@@ -1,5 +1,5 @@
 import re
-from app import USERS, CONTESTS
+from app import funcs, USERS, CONTESTS
 from enum import Enum
 import json
 from flask import Response
@@ -7,30 +7,23 @@ from http import HTTPStatus
 from abc import ABC, abstractmethod
 
 
-class Object(ABC):
+class Unit(ABC):
 
     @abstractmethod
     def convert_to_dict():
         pass
 
-    def get_response_json(self, response_method):
-        # forms the response in json view of object
-        if response_method == "OK":
-            response = Response(
-                json.dumps(self.convert_to_dict()),
-                HTTPStatus.OK,
-                mimetype="application/json",
-            )
-        if response_method == "CREATED":
-            response = Response(
-                json.dumps(self.convert_to_dict()),
-                HTTPStatus.CREATED,
-                mimetype="application/json",
-            )
+    def get_response_json(self, status_code):
+        # forms the response in json view of the Unit
+        response = Response(
+            json.dumps(self.convert_to_dict()),
+            status_code,
+            mimetype="application/json",
+        )
         return response
 
 
-class User(Object):
+class User(Unit):
 
     def __init__(self, first_name, last_name, email, sport):
         self.id = len(USERS)
@@ -44,19 +37,16 @@ class User(Object):
     def repr(self):
         # the representation of a User-object
         if self.status == User_status.CREATED.value:
-            return f"{self.id}) {self.first_name} {self.last_name}"
-        return f"DELETED{id}"
+            return f"#{self.id} {self.first_name} {self.last_name}"
+        return f"#{self.id} (DELETED)"
 
-    def create_list_of_contests(self):
+    def list_of_contests(self):
         # creates the list of user's contests (not ids but the Contest objects!)
-        user_contests = []
-        for contest in CONTESTS:
-            if (self.id in contest.participants) and (Contest.is_valid_id(contest.id)):
-                user_contests.append(contest)
+        user_contests = [CONTESTS[contest_id] for contest_id in self.contests]
         return user_contests
 
     def get_contests_json(self):
-        user_contests = self.create_list_of_contests()
+        user_contests = self.list_of_contests()
         response = Response(
             json.dumps(
                 {
@@ -82,10 +72,26 @@ class User(Object):
             "status": self.status,
         }
 
+    def contests_available(self):
+        available_contests = []
+        for contest in CONTESTS:
+            if (self.sport == contest.sport
+                and not contest.is_finished()
+                    and not self.id in contest.participants):
+                available_contests.append(contest)
+        return available_contests
+
+
+    def remove_from_all_contests(self):
+        # removes the data of deleted user from all contests (but not the contests' data from the user!)
+        user_contests = self.list_of_contests()
+        map(lambda contest: contest.validate_participants(), user_contests)
+
+
     @staticmethod
     # checks the id for validity
     def is_valid_id(id):
-        return (id >= 0 and id < len(USERS) and (USERS[id].status != User_status.DELETED.value))
+        return (0 <= id < len(USERS) and (USERS[id].status != User_status.DELETED.value))
 
     @staticmethod
     # checks the email for validity
@@ -101,12 +107,13 @@ class User(Object):
         return False
 
     @staticmethod
-    # checks if the email is already occupied by another user
     def is_email_occupied(email):
-        return any(user.email == email for user in USERS)
+        # checks if the email is already occupied by another user
+        # assume you can create a user with an email of any deleted user
+        return any(user.email == email for user in funcs.get_valid_users())
 
 
-class Contest(Object):
+class Contest(Unit):
 
     def __init__(self, name, sport):
         self.name = name
@@ -116,9 +123,10 @@ class Contest(Object):
         self.status = Contest_status.STARTED.value
         self.winner = Contest_winner.NOT_DEFINED.value
 
+
     def repr(self):
         # the representation of a Contest-object
-        return f"{self.id}) {self.name} ({self.status})"
+        return f"#{self.id} {self.name} ({self.status})"
 
     def convert_to_dict(self):
         # creates a dict of the class attributes for json.dumps when required
@@ -130,17 +138,17 @@ class Contest(Object):
             "status": self.status,
             "winner": self.winner,
         }
+    
+    def list_of_participants(self):
+        # returns the list of all the Users participating in the contest
+        participants = []
+        for part_id in self.participants:
+            participants.append(USERS[part_id])
+        return participants
 
-    def create_list_of_participants(self):
-        # creates a list of the contest participants (not ids but the User objects!)
-        contest_participants = []
-        for user in USERS:
-            if (self.id in user.contests) and (User.is_valid_id(user.id)):
-                contest_participants.append(user)
-        return contest_participants
 
     def get_participants_json(self):
-        cont_participants = self.create_list_of_participants()
+        cont_participants = self.list_of_participants()
         response = Response(
             json.dumps(
                 {
@@ -154,6 +162,13 @@ class Contest(Object):
         )
         return response
 
+
+    def validate_participants(self):
+        # removes deleted users from the list of participants
+        self.participants = [user.id for user in USERS
+                             if (user.id in self.participants and user.status != "Deleted")]
+
+
     def is_finished(self):
         # checks if the contest is finished
         return self.status == Contest_status.FINISHED.value
@@ -161,16 +176,15 @@ class Contest(Object):
     def finish(self, winner_id):
         if not self.is_finished():
             self.winner = winner_id
-            self.status = Contest_status.FINISHED.value
+        self.status = Contest_status.FINISHED.value
 
     def is_valid_winner(self, winner_id):
-        # checks if the user, being assigned as the winner, in the list of participants
-        return (winner_id in self.participants) and (USERS[winner_id].status == User_status.CREATED.value)
+        return winner_id in self.participants and User.is_valid_id(winner_id)
 
     @staticmethod
     # checks the contest id for validity
     def is_valid_id(id):
-        return 0 <= id < len(CONTESTS)
+        return 0 <= id < len(CONTESTS) 
 
     @staticmethod
     def is_valid_name(name):
