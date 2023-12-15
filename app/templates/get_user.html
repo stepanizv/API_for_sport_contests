@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    <h1>Hello, {{user.first_name}} {{user.last_name}}!</h1>
+    <h4>Your ID is {{user.id}}, your email is {{user.email}}</h4>
+    {% if user.contests == [] %}
+    No contests yet<br>
+    {% else %}
+    <h4>Here are your contests:</h4>
+    {% for contest in user.list_of_contests() %}
+    {{contest.id}}# <a href="{{url_for('front_get_contest', contest_id = contest.id)}}">{{contest.name}}</a><br>
+    {% endfor %}
+    {% endif %}
+    {% if user.status == "Created" %}
+    <a href="{{url_for('front_user_assigncont', user_id = user.id)}}">Assign some contest</a><br>
+    <a href="{{url_for('front_delete_user', user_id = user.id)}}">Delete the user</a>
+    {% else %}
+    <h4>Your profile is oficially deleted! Any actions are blocked!</h4>
+    {% endif %}
+</body>
+
+{% endblock %}

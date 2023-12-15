@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+
+    <h2>The contest {{contest.name}} is successfully finished!</h2>
+    {% if winner.status == "Created" %}
+    <h4><a href="{{url_for('front_get_user',user_id = winner.id)}}">#{{winner.id}} {{winner.first_name}}
+            {{winner.last_name}}</a> is the winner</h4>
+    {% else %}
+    <h4>#{{winner.id}} (DELETED) is the winner</h4>
+    {% endif %}
+</body>
+
+{% endblock %}

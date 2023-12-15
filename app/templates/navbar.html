@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary>
+    <div class=" container-fluid">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Users
+                </a>
+                <ul class="dropdown-menu">
+                    {% for user in USERS %}
+                    <li><a class="dropdown-item"
+                            href="{{url_for('front_get_user',user_id=user.id)}}">{{user.repr()}}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Contests
+                </a>
+                <ul class="dropdown-menu">
+                    {% for contest in CONTESTS %}
+                    <li><a class="dropdown-item"
+                            href="{{url_for('front_get_contest',contest_id=contest.id)}}">{{contest.repr()}}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{url_for('index')}}">Home</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Leaderboard
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="nav-link" href="{{url_for('front_users_leaderboard',type='graph')}}">Graph</a></li>
+                    <li><a class="nav-link" href="{{url_for('front_users_leaderboard',type='list')}}">List</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('front_users_create')}}">New User</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('front_contests_create')}}">New Contest</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</nav>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    <h1>Contest #{{contest.id}}</h1>
+    name: {{contest.name}}<br>
+    sport: {{contest.sport}}<br>
+    status: {{contest.status}}<br>
+    {% if contest.participants == [] %}
+    No participants<br>
+    {% else %}
+    participants:<br>
+    {% for part_id in contest.participants %}
+    {% if users_all[part_id].status == "Created" %}
+    #{{part_id}} <a href="{{url_for('front_get_user', user_id = part_id)}}">
+        {{users_all[part_id].first_name}} {{users_all[part_id].last_name}} </a><br>
+    {% else %}
+    #{{part_id}} (DELETED)<br>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% if winner %}
+    winner: #{{winner.id}} {{winner.first_name}} {{winner.last_name}}
+    {% else %}
+    {% if contest.participants != [] %}
+    <a href="{{url_for('front_contest_finish', contest_id=contest.id)}}">Finish the contest</a>
+    {% endif %}
+    {% endif %}
+</body>
+{% endblock %}

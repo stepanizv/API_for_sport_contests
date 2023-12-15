@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    {% if contest_data %}
+    <h1>Contest "{{contest_data['name']}}" created!</h1>
+    {% else %}
+    <h2>Enter the contest's data</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }} {{ form.name }} <br>
+        {{ form.sport.label }} {{ form.sport }} <br>
+        {{ form.submit }}
+    </form>
+    {% endif %}
+</body>
+{% endblock %}
